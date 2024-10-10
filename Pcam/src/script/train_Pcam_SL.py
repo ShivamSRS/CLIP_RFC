@@ -4,10 +4,13 @@ import torchvision.models
 import torch.nn.functional as F
 from torchvision import transforms
 from torch.utils.data import DataLoader
-from dataset.Pcam import Pcam
+from Pcam import Pcam
 from tqdm import tqdm
 import sklearn.metrics as metrics
 import sys
+sys.path.append("/cache/Shivam/clipadapter/CLIP_RFC/dataset")
+sys.path.append("/cache/Shivam/clipadapter/CLIP_RFC/dataset/Pcam.py")
+
 import wandb
 
 # define hyperparameters
@@ -16,7 +19,7 @@ lr = 1e-4
 weigh_decay = 5e-3
 batch_size = 32
 loss_fn = torch.nn.CrossEntropyLoss()
-DATA_DIR = "/home/zhli/Current-Work/Pcam_Experiment/dataset/DATA/pcamv1/"
+DATA_DIR = "/cache/Shivam/clipadapter/datasets/pcamv1/"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # wandb.init(project="Pcam")
@@ -46,7 +49,7 @@ def print_metrices(y_true, y_pred):
 def train(train_data, test_data, model, epochs):
     in_features = model.fc.in_features
     model.fc = nn.Linear(in_features, 2).to(device)
-    model = torch.nn.DataParallel(model, device_ids=[0, 1])
+    model = torch.nn.DataParallel(model, device_ids=[0])
     # wandb.watch(model)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weigh_decay)
     for _ in range(epochs):
@@ -73,13 +76,13 @@ def train(train_data, test_data, model, epochs):
             running_score += torch.sum(index_ == label.data).item()
             running_loss += loss.item()
             print("loss: ", loss)
-            wandb.log({"Training loss - Step": loss})
+            # wandb.log({"Training loss - Step": loss})
 
         epoch_score = running_score/train_data.__len__()
         epoch_loss = running_loss/train_data.__len__()
         print("Training loss: {}, accuracy: {}".format(epoch_loss, epoch_score))
-        wandb.log({"Training loss - Epoch": epoch_loss,
-                  "Training accuracy": epoch_score})
+        # wandb.log({"Training loss - Epoch": epoch_loss,
+        #           "Training accuracy": epoch_score})
     # recieve
     # test
     label_list = []
@@ -126,9 +129,9 @@ if __name__ == "__main__":
                              std=[0.229, 0.224, 0.225])
     ])
 
-    train_dataset = Pcam(path=train_path, transform=preprocess_pretrain)
-    test_dataset = Pcam(path=test_path, transform=test_transform)
-    val_dataset = Pcam(path=valid_path, transform=preprocess_pretrain)
+    train_dataset = Pcam(path=train_path, transform=preprocess_pretrain,percent_data=0.005)
+    test_dataset = Pcam(path=test_path, transform=test_transform,percent_data=1.0)
+    val_dataset = Pcam(path=valid_path, transform=preprocess_pretrain,percent_data=1.0)
 
     model_backbone = torchvision.models.resnet18().to(device)
     train(train_dataset, test_dataset, model_backbone, max_epoch)

@@ -33,7 +33,7 @@ def print_metrices(y_true, y_pred, y_score, y_class_score):
     
     # following https://docs.wandb.ai/guides/track/log/plots
     wandb.log({"roc": wandb.plot.roc_curve(
-        y_true, y_class_score, label={"healthy lymph node tissue", "lymph node tumor tissue"})})
+        y_true, y_class_score, labels={"healthy lymph node tissue", "lymph node tumor tissue"})})
 
 
 class CustomCLIP(nn.Module):
@@ -107,7 +107,7 @@ class CustomCLIP(nn.Module):
 
     def save(self):
         date = dt.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        path = './Pcam/src/model/checkpoints/CustomCLIP:' + date + '.pt'
+        path = '/cache/Shivam/clipadapter/CLIP_RFC/Pcam/src/model/checkpoints/CustomCLIP:' + date + '.pt'
         torch.save(self.state_dict(), path)
 
     def train(self):

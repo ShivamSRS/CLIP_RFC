@@ -36,7 +36,7 @@ class config():
         self.batch_size = 32
         self.epochs = 5
         self.alpha = 0.8
-        self.percent_training_set = 1.0
+        self.percent_training_set = 0.001
 
         # initialize dataset
         self.train_dataset = train_dataset
@@ -47,7 +47,7 @@ class config():
         # self.init_wandb()
 
     def init_wandb(self):
-        wandb.init(project="ShivamCustomCLIP")
+        wandb.init(project="NewOTArchDesignTrialsWithCLIPLoss")
 
         wandb.config.update({
             "dataset": "Pcam",
@@ -74,11 +74,11 @@ if __name__ == "__main__":
     valid_path = DATA_DIR + 'camelyonpatch_level_2_split_valid'
     test_path = DATA_DIR + 'camelyonpatch_level_2_split_test'
 
-    train_dataset = Pcam(path=train_path, transform=preprocess, percent_data=0.1, seed=42)
+    train_dataset = Pcam(path=train_path, transform=preprocess, percent_data=0.001, seed=42)
     test_dataset = Pcam(path=test_path, transform=preprocess, percent_data=1.0, seed=42)
     val_dataset = Pcam(path=valid_path, transform=preprocess, percent_data=1.0, seed=42)
 
-    print(len(train_dataset))
+    print(len(train_dataset),len(test_dataset))
     # exit()
     # init config
     config = config(backbone=backbone, CLIP=openai_clip, device=device, train_dataset=train_dataset,

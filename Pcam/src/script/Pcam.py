@@ -28,7 +28,7 @@ class Pcam(Dataset):
         self.percent_data = percent_data  # Fraction of data to use
         self.seed = seed
 
-        print(f"Initializing Pcam dataset with percent_data={self.percent_data}")
+        print(f"Initializing Pcam dataset with percent_data={self.percent_data*100} %")
 
         # Set the random seed for reproducibility if provided
         if self.seed is not None:
